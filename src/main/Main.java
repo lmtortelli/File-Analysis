@@ -9,37 +9,44 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import File.FileAnalysisReader;
+import Records.Record;
 
 
 public class Main extends Thread {
 	
 	private static String path_input;
-	private static String extension_files;
-	private static HashSet<String> filesOpen;
+	private static String path_outpath;
 
 	public static void main(String[] args) {
-		filesOpen = new HashSet<>();
+		Record.initialize();
 		try (InputStream input = new FileInputStream("resources/config/config.properties")) {
             Properties prop = new Properties();
             prop.load(input);
+            File[] listOfFiles;
             
             System.out.println("Running Sales Data Analysis - Lucas Tortelli");
             
             while(true) {
-            	path_input = System.getProperty(prop.getProperty("file.input_path"));
-            	extension_files = prop.getProperty("file.extension_input");
+            	Record.loadParameters(prop);
+            	path_input = System.getProperty(prop.getProperty("file.path"))+prop.getProperty("file.input_path");
+            	path_outpath = System.getProperty(prop.getProperty("file.path"))+prop.getProperty("file.output_path");
+            	new File(path_input).mkdirs();
+            	new File(path_outpath).mkdirs();
+            	File f;
+            	
+            	
+            	File folder = new File(path_input);
+            	listOfFiles = null;
+            	listOfFiles = folder.listFiles();
+                //System.out.println(listOfFiles.toString());
+                Record.addQueueFiles(listOfFiles);
                 
-            	//FIX
-            	File folder = new File(path_input+"/New");
-                File[] listOfFiles = folder.listFiles();
-
-                for(File f : listOfFiles) {
-                	if(f.getName().contains(extension_files) && !filesOpen.contains(f.getName())) {
-                		filesOpen.add(f.getName());
-                		Runnable instanceFile = new FileAnalysisReader(f);
-                		new Thread(instanceFile).start(); 
-                	}
+				if((f = Record.getFile()) != null) {
+					Runnable instanceFile = new FileAnalysisReader(f,path_outpath);
+	         		new Thread(instanceFile).start();
                 }
+         		
+               
             }
             
             

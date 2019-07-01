@@ -35,17 +35,39 @@ public class DataFactory implements Runnable {
 		
 		switch(data[0]) {
 			case "001":{
+				this.analyzer.analiseSalesman();
 				break;
 			}
 			case "002":{
+				this.analyzer.analyseCliente();
 				break;
 			}
 			case "003":{
+				this.analyzer.analiseSell(data[1], this.getPriceSell(data[2]), data[3]);
 				break;
 			}
 			
 		}
 		return null;
+	}
+
+	private float getPriceSell(String sell) {
+		float totalSell = 0;
+		// Clear  [ ] caracter
+		sell = sell.replace("[", "");
+		sell = sell.replace("]", "");
+		
+		String[] sAux = sell.split(",");
+		
+		String[] idItems = sAux[0].split("-");
+		String[] qtdItems = sAux[1].split("-");;
+		String[] priceItems = sAux[2].split("-");
+		
+		for (int i = 0; i < qtdItems.length ; i++) {
+			totalSell+= Float.parseFloat(qtdItems[i]) * Float.parseFloat(priceItems[i]);
+		}
+		
+		return totalSell;
 	}
 
 	@Override
