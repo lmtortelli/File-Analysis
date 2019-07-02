@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
 
-import File.FileAnalysisReader;
+import File.FileProcess;
 
 public abstract class Record { 
 	
@@ -32,35 +32,38 @@ public abstract class Record {
 	
 	public static void addQueueFiles(File[] files) {
 		 for(File f : files) {
-         	if(f.getName().contains(extension_files) 
+         	if(f.exists() && 
+         			f.getName().contains(extension_files) 
          			&& !Record.waitingFiles.contains(f.getPath()) 
          			&& !Record.filesOpen.contains(f.getPath())) {
-         		
          		Record.waitingFiles.add(f.getPath());
          	}
          }
 	}
 	public static void removeFileOpened(File f) throws IOException {
+		Files.deleteIfExists(Paths.get(f.getPath()));
 		if(Record.waitingFiles.contains(f.getPath())) {
 			Record.waitingFiles.remove(f.getPath());
+
 		}
 		
 		if (Record.filesOpen.contains(f.getPath())) {
 			Record.filesOpen.remove(f.getPath());
 		}
 		
-		Files.deleteIfExists(Paths.get(f.getPath()));
-		
-		System.out.println("File Removed");
 		
 	}
 	
 	public static File getFile() {
 		if(Record.filesOpen.size() < Record.allowFilesOpened) {
 			if(Record.waitingFiles.size() != 0) {
-				File fAux = new File(Record.waitingFiles.poll());
-				Record.filesOpen.add(fAux.getPath());
-				return fAux;
+				String pathFile= Record.waitingFiles.peek();
+				File fAux = new File(pathFile);
+				if(fAux.canRead()) {
+					Record.waitingFiles.remove(pathFile);
+					Record.filesOpen.add(pathFile);
+					return fAux;
+				}
 			}
 			return null;
 		}
@@ -68,4 +71,7 @@ public abstract class Record {
 		return null;
 	}
 	
+	public static boolean emptyWaitingFiles() {
+		return (Record.waitingFiles.size() == 0);
+	}
 }

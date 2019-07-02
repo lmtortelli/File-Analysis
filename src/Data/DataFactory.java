@@ -6,16 +6,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import File.FileAnalysisReader;
 import File.FileProcess;
+import File.FileDataAnalysis;
 
 public class DataFactory implements Runnable {
 	
 	private String regex;
-	private FileProcess analyzer;
+	private FileDataAnalysis analyzer;
 	String dataRow;
 	
-	public DataFactory(FileProcess analyzer, String dataRow ) {
+	public DataFactory(FileDataAnalysis analyzer, String dataRow ) {
 		this.dataRow = dataRow;
 		this.analyzer = analyzer;
 		try (InputStream input = new FileInputStream("resources/config/config.properties")) {
@@ -28,10 +28,9 @@ public class DataFactory implements Runnable {
         }
 	}
 	
-	public IData getData() {
+	public void processData() {
 		
 		String[] data = this.dataRow.split(this.regex);
-		//System.out.println(data[0]);
 		
 		switch(data[0]) {
 			case "001":{
@@ -39,7 +38,7 @@ public class DataFactory implements Runnable {
 				break;
 			}
 			case "002":{
-				this.analyzer.analyseCliente();
+				this.analyzer.analiseClient();
 				break;
 			}
 			case "003":{
@@ -48,7 +47,6 @@ public class DataFactory implements Runnable {
 			}
 			
 		}
-		return null;
 	}
 
 	private float getPriceSell(String sell) {
@@ -72,6 +70,6 @@ public class DataFactory implements Runnable {
 
 	@Override
 	public void run() {
-		this.getData();
+		this.processData();
 	}
 }
