@@ -15,6 +15,12 @@ import java.util.ArrayList;
 import Data.DataFactory;
 import Records.Record;
 
+
+/**
+ * Responsável por consumir cada linha de dados dos arquivos de entrada e após análise criar o arquivo de saída.
+ * @author lmtor
+ *
+ */
 public class FileProcess implements Runnable  {
 	
 	private File file;
@@ -27,6 +33,10 @@ public class FileProcess implements Runnable  {
 		this.file = file;
 	}
 	
+	/**
+	 * Responsável por análisar cada linha do arquivo, delegando dessa maneira uma Thread para cada tarefa. Esta abordagem ocorreu para simular
+	 * um produtor/consumidor não criando dessa maneira uma fila de espera e extraíndo o máximo proveito dos recursos computacionais.
+	 */
 	@Override
     public void run()  
     { 

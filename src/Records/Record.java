@@ -12,6 +12,13 @@ import java.util.Queue;
 
 import File.FileProcess;
 
+
+/**
+ * Classe responsável pela manutenabilidade da quantidade de arquivos que podem ser abertos e análisados ao mesmo tempo, com os arquivos ja abertos
+ * 
+ * @author lmtor
+ *
+ */
 public abstract class Record { 
 	
 	private static int allowFilesOpened = 0;
@@ -20,16 +27,28 @@ public abstract class Record {
 	private static Queue<String> waitingFiles;
 	private static HashSet<String> filesOpen;
 	
+	
+	/**
+	 * Responsável por carregar os parâmetros obtidos do arquivo de properties
+	 * @param prop
+	 */
 	public static void loadParameters(Properties prop) {
 		Record.allowFilesOpened = Integer.parseInt(prop.getProperty("app.maxFilesReader"));
 		Record.extension_files = prop.getProperty("file.extension_input");
 	}
 	
+	/**
+	 * Inicializa as estruturas de controle de código
+	 */
 	public static void initialize() {
 		Record.waitingFiles = new LinkedList<>();
 		Record.filesOpen = new HashSet<>();
 	}
 	
+	/**
+	 * Adiciona novo arquivo a fila de Arquivos, caso ele não existe na fila de arquivos em espera nem na fila de arquivos em análise.
+	 * @param files
+	 */
 	public static void addQueueFiles(File[] files) {
 		 for(File f : files) {
          	if(f.exists() && 
@@ -40,6 +59,12 @@ public abstract class Record {
          	}
          }
 	}
+	
+	/**
+	 * Remove arquivo da fila de em análise, consequentemente deletando o arquivo do diretório de entrada.
+	 * @param f
+	 * @throws IOException
+	 */
 	public static void removeFileOpened(File f) throws IOException {
 		Files.deleteIfExists(Paths.get(f.getPath()));
 		if(Record.waitingFiles.contains(f.getPath())) {
@@ -54,6 +79,10 @@ public abstract class Record {
 		
 	}
 	
+	/**
+	 * Retorna um arquivo e adiona o mesmo a fila de arquivos em análise, removendo-o da fila de arquivos em espera.
+	 * @return
+	 */
 	public static File getFile() {
 		if(Record.filesOpen.size() < Record.allowFilesOpened) {
 			if(Record.waitingFiles.size() != 0) {

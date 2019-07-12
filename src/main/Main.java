@@ -18,7 +18,11 @@ import java.util.Properties;
 import File.FileProcess;
 import Records.Record;
 
-
+/**
+ * Classe principal de execução da aplicação
+ * @author lmtor
+ *
+ */
 public class Main extends Thread {
 	
 	private static String path_input;
